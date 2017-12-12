@@ -1,0 +1,70 @@
+include("misc.jl") # Includes GenericModel typedef
+
+function knn_predict(Xhat,X,y,k)
+  (n,d) = size(X)
+  (t,d) = size(Xhat)
+  k = min(n,k) # To save you some debuggin
+  yhat=zeros(t)
+
+  D=X.^2*ones(d,t)+ones(n,d)*(Xhat').^2-2*X*Xhat'  #pre-calculate all distances
+
+  nk=k
+  ytemp=y
+
+  for j in 1:t	 
+#	for i in 1:n
+#		dd[i]=(Xhat[j,1]-X[i,1]).^2 + (Xhat[j,2]-X[i,2]).^2
+#	end
+#	findmin(dd,k)
+
+	tt=D[:,j]
+
+
+	val = zeros(nk)
+	idx=ones(Int64,nk)
+        #@show(idx)
+	for ii in 1:nk #find the first nk smallest distances
+	  #[val[ii],idx[ii]] = findmin(tt)
+	   mintemp=findmin(tt)
+		#@show(mintemp)
+           val[ii]=mintemp[1]
+           	   #@show(idx[ii])
+	   idx[ii]=mintemp[2]
+	   #Int(idx[ii])
+		    #@show(idx[ii])
+	  # remove for the next iteration the last smallest value:
+	  tt[(idx[ii])] = 1e9
+	end
+          #@show(nk)
+          #@show(idx)
+	ytemp2=ytemp[idx]
+        #@show(ytemp2)
+        yhat[j]=mode(ytemp2); #pick out the mode value of the nk values
+  end
+
+  return yhat#fill(1,t)
+end
+
+function knn(X,y,k)
+	# Implementation of k-nearest neighbour classifier
+
+  predict(Xhat) = knn_predict(Xhat,X,y,k)
+  return GenericModel(predict)
+end
+
+function cknn(X,y,k)
+	# Implementation of condensed k-nearest neighbour classifier
+	(n,d) = size(X)
+	Xcond = X[1,:]'
+	ycond = [y[1]]
+	for i in 2:n
+    		yhat = knn_predict(X[i,:]',Xcond,ycond,k)
+    		if y[i] != yhat[1]
+			Xcond = vcat(Xcond,X[i,:]')
+			push!(ycond,y[i])
+    		end
+	end
+
+	predict(Xhat) = knn_predict(Xhat,Xcond,ycond,k)
+	return GenericModel(predict)
+end

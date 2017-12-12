@@ -1,0 +1,382 @@
+###### File system navigation ######
+
+# Print the current directory
+pwd()
+
+# Change to the directory a0
+cd("a0")
+
+# Change to D:\ on Windows (notice the forward slash)
+cd("D:/")
+
+# List the contents of a directory
+readdir()
+
+
+
+###### Basic variables and 1D mathematical operations ######
+
+# Make a variable x and assign it the number 2
+x = 2
+
+# Same as above, but don't print any output
+x = 2;
+
+# Show the contents of the variable x
+show(x)
+
+# Show the value of x + 3
+x + 3
+
+# Assign the value (x+3) to a variable y
+y = x + 3
+
+# Subtract 3 from x in place (this doesn't change y)
+x -= 4
+
+# Multiplication by constants is really slick
+3x
+
+# For multiplying variables
+x*x
+
+# Other basic operations
+x^2
+log(x)
+exp(x)
+
+
+###### Random stuff ######
+
+# Show the values in a variable 'x'
+@show(x)
+
+# Run the code contained in a file
+include("file.jl")
+
+# Show the documentation for function "func"
+?func()
+
+# Look for a string among the available functions
+apropos("myString")
+
+# Clear all variables
+workspace()
+
+# Paste from the clipboard
+clipboard()
+
+
+
+
+###### Vectors ######
+
+# Make a row vector containing (1,2,3,4)
+x = [1 2 3 4]
+
+# Make a column vector containing (1,2,3,4)
+x = [1;2;3;4]
+
+# Alternately:
+x = [1
+	2
+	3
+	4]
+
+# Number of elements in vector
+length(x)
+
+# A vector of 10 zeroes
+zeros(10)
+
+# A vector of 10 ones
+ones(10)
+
+# A vector of 10 eights
+fill(8,10)
+
+# Access element 2
+x[2]
+
+# Access first two elements
+x[1:2]
+
+# Access last two elements
+x[end-1:end]
+
+# Access every second element
+x[2:2:end]
+
+# The vector in reverse order
+x[end:-1:1]
+
+# x as a column-vector
+x[:]
+
+# Scalar multiplication by 3
+3x
+
+# Alternately
+alpha = 3
+alpha*x
+
+# Norm of x
+norm(x)
+
+# Vector additon
+x = [1;2;3]; y = [4;5;6]
+x + y
+
+# min, max, mean, median
+minimum(x)
+maximum(x)
+mean(x)
+median(x)
+
+# Sum of values in vector
+sum(x)
+
+# Product of values in vector
+prod(x)
+
+# Square of each element
+x.^2
+
+# Exponential and log of each element
+exp.(x)
+log.(x)
+
+# Sort the elements of the vector
+sorted = sort(x)
+
+# Sort the vector in-place
+sort!(x)
+
+# Get the indexes needed to sort the vector
+sortperm(x)
+
+# Inner product of column vectors
+x'*y
+
+### CAUTION (vectors and matrices are pointers) ###
+# Setting y = x sets y to *point* to the same vector as x
+# 	This is faster than making a copy, but changing x
+# 	also changes y
+y = x
+x[3] *= 10
+y[3] # Will be x[3]*10
+y[2] = 0
+x[2] # Will be zero
+
+# Changing x on the right-side in any way makes a copy.
+y = 1x
+x[3] *= 10
+y[3] # Will still be the old value of x[3]
+y[2] = 0
+x[2] # Won't be changed
+
+
+
+###### Matrices ######
+
+# Create a matrix
+A = [1 2 3;4 5 6;7 8 9]
+
+# Alternately
+B = [1 2 3
+	4 5 6
+	7 8 9]
+
+# Store the dimensions in 'n' and 'd'
+(n,d) = size(X)
+
+# Accessing elements
+A[2,3]
+
+# Grab the first column
+A[:,1]
+
+# Scalar multiplication
+2A
+
+# Scalar multplication with variable
+alpha*A
+
+# Matrix addition
+A + B
+
+# Matrix element-wise multplication
+# (this assumes they have the same dimensions)
+A.*B
+
+# Matrix multiplication
+A*B
+
+# Matrix element-wise power
+A.^2
+
+# Matrix-vector multiplication
+x = [1;2;3]
+A*x
+
+# Make a vector out of the matrix elements, in "column-major" order
+A[:]
+
+# Minimum value in the whole matrix
+minimum(A)
+
+# Minimum value in each column (similar to maximum, mean, median)
+minimum(X,1)
+
+# Minimum value in each row
+minimum(X,2)
+
+
+
+
+###### Control structures ######
+
+# Loop for 10 iterations and print iteration number
+for i in 1:10
+	@printf("i = %d\n",i)
+end
+
+### CAUTION (variable scoping in control structures) ###
+# If you run the above code and 'i' is already defined, it will replace the current value of 'i'.
+# If you run the above code and 'i' is not defined, it will still be undefined at the end of the loop.
+
+# Indenting doesn't matter but makes code look nicer
+for i in 1:10
+@printf("i = %d\n",i)
+end
+
+# Ugliest version (not recommended)
+for i in 1:10; @printf("i = %d\n",i);end
+
+# While loop
+i = 1
+while mod(i,10) != 0
+	@printf("Not a multiple of 10 yet\n");
+	i += 1;
+end
+
+# If-else
+
+if i == 10
+	@printf("Ten!\n");
+elseif i == 20
+	j = 20 % Will only remain defined if it 
+	@printf("Twenty!\n");
+else
+	@printf("I was hoping for ten or twenty.\n");
+end
+
+###### Logic ######
+
+# Test equality of scalars
+x == y
+
+# Test approximate equality
+isapprox(x,y)
+
+# Test not equal
+x != y
+
+# Not x
+!x
+
+# Apply logical operators element-wise to vectors with '.'
+x .== y
+
+# Test if any or all elements of a vector are true
+any(x)
+all(x)
+
+
+###### Functions ######
+
+# Define a simple one-line one-input one-output function
+f(x) = 3(x+2)^2
+
+# Now we can evaluate the function
+f(2)
+
+# Using the function name without parentheses gives a pointer to the function
+g = f
+f(2)
+
+# Multi-input multi-output function
+F(x,y) = (2x,x+y)
+
+# Evaluating it and returning multiple arguments
+(out1,out2) = F(2,3)
+
+# Multi-line functions use "function" (returns value of last statement)
+function f(x)
+	tau = 2*pi;
+	x + tau;
+end
+
+# You can also use an explicit "return" for more complicated functions
+function f(x,y)
+	if x >= y
+		return x # Single output
+	else
+		return (x,y) # Multi-output
+	end
+end
+
+### CAUTION (pass by value vs. pass by reference) ###
+# Julia uses pass by value, so change argument within function doesn't change the original variable.
+# But, the argument is a pointer (like a vector or matrix) and you change the values in the reference object, they will be changed outside the function too.
+# A common convention if a function changes its input is to end the function with a "!".
+
+
+
+###### Save and loading data ######
+
+# Install and/or start using the package JLD
+Pkd.add("JLD")
+using JLD
+
+# Save variables X and y in a JLD file
+save("file.jl","X",X,"y",y)
+
+# Loading an individual variable
+X = load("file.jl","X")
+
+# Loading the variables and their names as a dictionary
+data = load("file.jl")
+
+
+
+
+
+
+###### Plotting with PyPlot #######
+
+# Run this once to add the package
+Pkg.add("PyPlot")
+
+# Run this in each session you want to use the package
+using PyPlot
+
+# Basic Line Plot
+plot(x,y)
+
+# Histogram with 10 bins
+plt[:hist](x,10)
+
+# Box plot
+boxplot(X)
+
+# Scatter plot
+scatter(x,y)
+
+
+
+###### Comments ######
+
+# There is a lot more neat stuff like hash functions and regular expressions and list comprehension,
+# and lots of neat CS stuff like variable typing for speed and overloading "+",
+# but I'll keep the above up to date with all you need for the assignments.

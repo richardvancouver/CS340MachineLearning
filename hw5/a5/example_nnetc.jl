@@ -1,0 +1,78 @@
+# Load X and y variable
+using JLD
+using PyPlot
+include("misc.jl")
+data = load("basisData.jld")
+(X,y) = (data["X"],data["y"])
+n = size(X,1)
+
+XOld=X
+yOld=y
+minX=minimum(X)
+X=X-minimum(X)
+maxX=maximum(X)
+X=X./maximum(X)
+minY=minimum(y)
+y=y-minimum(y)
+maxY=maximum(y)
+y=y./maximum(y)
+
+#(X,mu,sigma) = standardizeCols(X)
+#(y,mu1,sigma1) = standardizeCols(y)
+
+X = [ones(n,1) X]
+d = 2
+
+# Choose network structure and randomly initialize weights
+include("NeuralNet.jl")
+nHidden = [27 40 27]#[30] #rand(1:10,1,10) #[3,3,10,10,3,1]
+lambda=ones(length(nHidden)+1,1)*0.001
+@show(nHidden)
+nParams = NeuralNet_nParams(d,nHidden)
+w = randn(nParams,1)
+
+# Train with stochastic gradient
+maxIter = 10000*2
+stepSize = 1e-4*5
+for t in 1:maxIter
+	if t > maxIter/2
+        stepSize = stepSize * (1-2/maxIter)^2;
+    end
+    wOld = w
+    wOldOld= wOld
+	# The stochastic gradient update:
+	s=0
+	sf=0
+	iterns=20
+	for kk in 1:iterns
+		i = rand(1:n)
+		(f,g) = NeuralNet_backprop(w,X[i,:],y[i],nHidden)
+		s=s+g
+		sf=sf+f
+	end
+    g=s/iterns
+    f=sf/iterns
+
+ #    i = rand(1:n)
+	# (f,g) = NeuralNet_backprop(w,X[i,:],y[i],nHidden)
+	w = w - stepSize*g + stepSize^2*(w-wOldOld) 
+
+	# Every few iterations, plot the data/model:
+	if (mod(t-1,round(maxIter/50)) == 0)
+		@printf("Training iteration = %d\n",t-1)
+		figure(1)
+		clf()
+		#Xhat =-10:.05:10#XOld #-10:.05:10#
+		XhatOld = minX:.05:(maxX+minX)
+        Xhat=(XhatOld - minX)./maxX
+
+		yhat = NeuralNet_predict(w,[ones(length(Xhat),1) Xhat],nHidden)
+		#plot(X[:,2],y,".")
+		#plot(Xhat,yhat,"g-")
+		plot(XOld,yOld,".")
+		plot(XhatOld,((yhat.*maxY)+minY),"g-")
+		sleep(.1)
+	end
+end
+
+
